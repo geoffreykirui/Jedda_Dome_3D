@@ -1,100 +1,36 @@
+<!DOCTYPE html>
+<html>
 <head>
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=no" />
-    <meta charset="utf-8">
-
-    <!-- The Viewer CSS -->
-    <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/6.*/style.min.css" type="text/css">
-
-    <!-- Developer CSS -->
+    <meta charset='utf-8' />
+    <title>MapBox with Forge Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.js'></script>
+    <link href='https://wallabyway.github.io/toolkitServerv2/skeleton.min.css' rel='stylesheet' />
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.3.1/mapbox-gl.css' rel='stylesheet' />
     <style>
-        body {
-            margin: 0;
-        }
-        #MyViewerDiv {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            background-color: #F0F8FF;
-        }
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .navbar {background: #ffffffe0;}
+        .navbar-img {margin: 15px;}
     </style>
 </head>
 <body>
-
-    <!-- The Viewer will be instantiated here -->
-    <div id="MyViewerDiv"></div>
-
-    <!-- The Viewer JS -->
-    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/6.*/viewer3D.min.js"></script>
-
-    <!-- Developer JS -->
-    <script>
-        var viewer;
-        var options = {
-            env: 'AutodeskProduction2',
-            accessToken: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IlU3c0dGRldUTzlBekNhSzBqZURRM2dQZXBURVdWN2VhIn0.eyJzY29wZSI6WyJjb2RlOmFsbCIsImRhdGE6d3JpdGUiLCJkYXRhOnJlYWQiLCJidWNrZXQ6Y3JlYXRlIiwiYnVja2V0OmRlbGV0ZSIsImJ1Y2tldDpyZWFkIl0sImNsaWVudF9pZCI6Ik1FMm1MaUFwNk9ycWlBUEx4Q2hkd3hQRFVWYk5GVUs0IiwiYXVkIjoiaHR0cHM6Ly9hdXRvZGVzay5jb20vYXVkL2Fqd3RleHA2MCIsImp0aSI6IjVwenZyZ2h1MEVNU1IwMGlkdFVUYlUzRm5jQjQ5MFNaT0JjUXVHZ1Q2eUxCVlUzMnFvNWJiOUk4SFRaQXlMUjAiLCJleHAiOjE2NTA1NDgwNDV9.M2kZyhoNItYCr8RFHu2UsP2ALdpuD30g7bqQU924Iw49aKJOcsaM4K-0Aena1cLOIQ1ERLQk-6vRgRwwJ6WOVmEN_NYe9uRaqLTlwt5uUJwF6bvrhPyXZAZKnLYYFKAccz1uJkhcaH0H3PkO0y-nJKVqqB4DeiUiaROhAr4BUli6EBvdcgGi-HrjQo0FxTCGFTxyOPXwsOlrIW34NIJ-OgSW4BYUppSBQ4DiWVVnI1tufdUuMvW5XM7ilJRZJBcHULHIm7DEsxkJOZs3tHIOYDesYSNUGftU2Ip5HbFmboeMpFrVLZsCO1AWqWJGdUnJa1_750lWX1E2pJm7uVbHDw',
-            api: 'derivativeV2_EU'    // for models uploaded to EMEA change this option to 'derivativeV2_EU'
-        };
-        var documentId = 'urn:dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6YnVja2V0M2QvSmVkZGFoJTIwU3VwZXIlMjBEb21lX0VfMTItMV8wMDEuemlw';
-        Autodesk.Viewing.Initializer(options, function onInitialized(){
-            Autodesk.Viewing.Document.load(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
-        });
-
-        /**
-        * Autodesk.Viewing.Document.load() success callback.
-        * Proceeds with model initialization.
-        */
-        function onDocumentLoadSuccess(doc) {
-
-            // A document contains references to 3D and 2D geometries.
-            var geometries = doc.getRoot().search({'type':'geometry'});
-            if (geometries.length === 0) {
-                console.error('Document contains no geometries.');
-                return;
-            }
-
-            // Choose any of the avialable geometries
-            var initGeom = geometries[0];
-
-            // Create Viewer instance
-            var viewerDiv = document.getElementById('MyViewerDiv');
-            var config = {
-                extensions: initGeom.extensions() || []
-            };
-            viewer = new Autodesk.Viewing.Private.GuiViewer3D(viewerDiv, config);
-
-            // Load the chosen geometry
-            var svfUrl = doc.getViewablePath(initGeom);
-            var modelOptions = {
-                sharedPropertyDbPath: doc.getPropertyDbPath()
-            };
-            viewer.start(svfUrl, modelOptions, onLoadModelSuccess, onLoadModelError);
-        }
-
-        /**
-         * Autodesk.Viewing.Document.load() failure callback.
-         */
-        function onDocumentLoadFailure(viewerErrorCode) {
-            console.error('onDocumentLoadFailure() - errorCode:' + viewerErrorCode);
-        }
-
-        /**
-         * viewer.loadModel() success callback.
-         * Invoked after the model's SVF has been initially loaded.
-         * It may trigger before any geometry has been downloaded and displayed on-screen.
-         */
-        function onLoadModelSuccess(model) {
-            console.log('onLoadModelSuccess()!');
-            console.log('Validate model loaded: ' + (viewer.model === model));
-            console.log(model);
-        }
-
-        /**
-         * viewer.loadModel() failure callback.
-         * Invoked when there's an error fetching the SVF file.
-         */
-        function onLoadModelError(viewerErrorCode) {
-            console.error('onLoadModelError() - errorCode:' + viewerErrorCode);
-        }
-
-    </script>
+<div id='map'></div>
+  <div class="container">
+    <nav class="navbar">
+      <div class="container">
+        <ul class="navbar-list">
+          <li class="navbar-item"><img class="navbar-img" src="https://wallabyway.github.io/toolkitServerv2/logo.png"/></li>
+          <li class="navbar-item"><button onClick="buildings.flyToHome()" class="navbar-button button-primary">Home</button></li>
+          <li class="navbar-itemr"><a href="https://github.com/wallabyway/mapboxRevit"><button class="navbar-button">GitHub</button></a></li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+  <div id="toast"></div>
+<script src='https://unpkg.com/three@0.106.2/build/three.js'></script>
+<script src="https://unpkg.com/three@0.106.2/examples/js/loaders/GLTFLoader.js"></script>
+<script language="JavaScript" src="https://xf79h9aa3l.execute-api.us-west-2.amazonaws.com/toolkit2/api/_adsk.js"></script>
 </body>
+<script src='app.js'></script>
+</html>
