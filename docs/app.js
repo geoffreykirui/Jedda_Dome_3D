@@ -83,8 +83,10 @@ class glTFLayer {
 
         // use the three.js GLTF loader to add the 3D model to the three.js scene
         var loader = new THREE.GLTFLoader();
-        loader.load('gltf/output.gltf', (function(gltf) {
+        loader.load('gltf/Jeddah_Super_Dome_E_12-1_001.gltf', (function(gltf) {
             this.scene.add(gltf.scene);
+	// loader.load('gltf/output.gltf', (function(gltf) {
+        //    this.scene.add(gltf.scene);
         }).bind(this));
         this.map = map;
 
